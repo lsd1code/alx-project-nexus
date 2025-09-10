@@ -18,3 +18,19 @@ This is a project dedicated to documenting major learnings from the ProDev Backe
 - `Best Practices & Takeaways`: Highlights industry best practices and personal insights.
 
 - `Collaboration Hub`: Encourages teamwork between `Frontend` and `Backend` learners.
+
+## Collaboration - Key For Success
+
+### Collaboration with whom?
+
+- `Fellow ProDev Frontend learners`: Exchange ideas, develop synergies, organize study/coding sessions. Maximize your potential and that of your colleagues.
+
+- `ProDev Backend learners`: Collaboration with backend learners is essential, as you will use their endpoints to complete your project.
+
+### Where to collaborate?
+
+#### Dedicated discord channel: [#ProDevProjectNexus](https://discord.com/channels/1300385210730287156/1341336995963863040)
+
+- Connect with both `Frontend` and `Backend` learners
+
+- Use the channel to exhange ideas, ask/answer questions, and stay updated with announcements from the staff.
