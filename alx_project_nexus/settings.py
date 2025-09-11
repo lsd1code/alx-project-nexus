@@ -74,20 +74,14 @@ WSGI_APPLICATION = "alx_project_nexus.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "USER": os.getenv("POSTGRES_USER"),
+        "NAME": os.getenv("POSTGRES_DB_NAME"),
+        "PASSWORD": os.getenv("POSTGRES_DB_PASSWORD"),
+        "HOST": os.getenv("POSTGRES_HOST"),  # Or your PostgreSQL host
+        "PORT": os.getenv("POSTGRES_PORT"),  # Or your PostgreSQL port
     }
 }
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": os.getenv("POSTGRES_DB_NAME"),
-#         "PASSWORD": os.getenv("POSTGRES_DB_PASSWORD"),
-#         "HOST": os.getenv("POSTGRES_HOST"),  # Or your PostgreSQL host
-#         "PORT": os.getenv("POSTGRES_PORT"),  # Or your PostgreSQL port
-#     }
-# }
 
 
 # Password validation
