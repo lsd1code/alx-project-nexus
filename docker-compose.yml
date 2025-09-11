@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   db:
@@ -6,9 +6,9 @@ services:
     container_name: postgres_d_compose
     restart: always
     environment:
-      POSTGRES_USER: postgres_user
-      POSTGRES_PASSWORD: postgres_pwd
-      POSTGRES_DB: postgres_db
+      POSTGRES_USER: POSTGRES_DB_USER
+      POSTGRES_PASSWORD: POSTGRES_DB_PASSWORD
+      POSTGRES_DB: POSTGRES_DB_NAME
     ports:
       - "5432:5432"
     volumes:
@@ -23,9 +23,3 @@ services:
       - "8000:8000"
     depends_on:
       - db
-  
-
-
-
-
-
