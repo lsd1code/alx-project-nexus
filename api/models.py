@@ -46,10 +46,11 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4())
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
     description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     stock = models.PositiveIntegerField()
     category = models.ForeignKey(
         Category, on_delete=models.DO_NOTHING, related_name="products"
