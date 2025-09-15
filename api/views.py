@@ -13,12 +13,60 @@ from api.serializers import CategorySerializer, ProductSerializer
 
 @api_view(["GET"])
 def featured_products_listing(req: Request):
+    """
+    Retrieves a list of featured products.
+
+    This view filters the Product queryset to include only products marked as featured
+    (`is_featured=True`). The resulting queryset is serialized using the `ProductSerializer`
+    and returned as a response.
+
+    Args:
+        req (Request): The HTTP request object.
+
+    Returns:
+        Response: A response object containing serialized data of featured products.
+
+    Raises:
+        None
+
+    Example:
+        GET /api/featured-products/
+        Returns a JSON array of featured products.
+    """
     products = Product.objects.filter(is_featured=True)
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 
 
+@api_view(['POST'])
+def register(req: Request):
+    pass
+
+
+@api_view(['POST'])
+def login(req: Request):
+    pass
+
+
 class ProductViewSet(ModelViewSet):
+    """
+    A viewset for viewing and editing Product instances.
+    This viewset provides the following functionality:
+    - Lists all products or filters products by category slug via query parameter.
+    - Uses `ProductSerializer` for serialization.
+    - Allows search filtering.
+    - Restricts access to authenticated admin users by default, but allows unrestricted access for GET requests.
+    - Overrides `get_permissions` to allow public access for GET requests.
+    - Overrides `get_queryset` to support filtering products by category slug.
+    Attributes:
+        queryset (QuerySet): The base queryset of all Product instances.
+        serializer_class (Serializer): The serializer class for Product.
+        filter_backends (list): List of filter backends to use for filtering.
+        permission_classes (list): List of permission classes for access control.
+    Methods:
+        get_permissions(self): Returns the permission classes based on the request method.
+        get_queryset(self): Returns the queryset, optionally filtered by category slug.
+    """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [SearchFilter]
@@ -40,6 +88,29 @@ class ProductViewSet(ModelViewSet):
 
 
 class CategoryViewSet(ModelViewSet):
+    """
+    A viewset for handling Category objects and their related Products.
+    This viewset provides CRUD operations for Category instances, with custom permission handling:
+    - Allows any user to perform GET requests (list and retrieve).
+    - Restricts other methods (POST, PUT, DELETE) to authenticated admin users.
+    Attributes:
+        queryset (QuerySet): All Category objects.
+        serializer_class (Serializer): Serializer for Category objects.
+        lookup_url_kwarg (str): URL keyword argument used to look up Category by slug.
+        permission_classes (list): Default permissions (authenticated admin users).
+    Methods:
+        get_permissions():
+            Dynamically sets permissions based on request method.
+            - GET requests are allowed for any user.
+            - Other methods require admin authentication.
+        retrieve(request, slug=None):
+            Retrieves a Category by slug and returns serialized data for all Products in that Category.
+            - Args:
+                request (Request): The HTTP request object.
+                slug (str, optional): The slug of the Category to retrieve.
+            - Returns:
+                Response: Serialized data of products belonging to the specified Category.
+    """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_url_kwarg = "slug"
