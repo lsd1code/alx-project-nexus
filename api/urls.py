@@ -4,12 +4,18 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from api.views import index
+from api.views import CategoryViewSet, ProductViewSet, featured_products_listing
+
+router = DefaultRouter()
+router.register(r"products", ProductViewSet, basename="products_listing")
+router.register(r"categories", CategoryViewSet, basename="categories_listing")
+
 
 urlpatterns = [
-    path("", index, name="index"),
+    path("", featured_products_listing, name="featured_products"),
     path("token/", TokenObtainPairView.as_view(), name="token_obatain_pair"),
     path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
@@ -23,4 +29,4 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-]
+] + router.urls

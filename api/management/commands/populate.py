@@ -428,21 +428,21 @@ class Command(BaseCommand):
             is_superuser=False,
         )
 
-        # for cat in self.categories:
-        #     Category(
-        #         name=cat["name"],
-        #         slug=cat["slug"],
-        #         description=cat["description"]
-        #     ).save()
-        #
-        # for prod in self.products:
-        #     Product.objects.create(
-        #         name=prod['name'],
-        #         slug=prod['slug'],
-        #         description=prod['description'],
-        #         price=prod['price'],
-        #         stock=prod['stock'],
-        #         category=Category.objects.get(pk=prod['category'])
-        #     )
+        for cat in self.categories:
+            Category(
+                name=cat["name"],
+                slug=cat["slug"],
+                description=cat["description"]
+            ).save()
+
+        for prod in self.products:
+            Product.objects.create(
+                name=prod['name'],
+                slug=prod['slug'],
+                description=prod['description'],
+                price=prod['price'],
+                stock=prod['stock'],
+                category=Category.objects.get(pk=prod['category'])
+            )
 
         self.stdout.write(self.style.SUCCESS("Database population complete."))
