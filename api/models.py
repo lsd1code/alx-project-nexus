@@ -56,6 +56,7 @@ class Product(models.Model):
         Category, on_delete=models.DO_NOTHING, related_name="products"
     )
     image = models.ImageField(upload_to="product_images/", blank=True, null=True)
+    is_featured = models.BooleanField(default=False)
 
     @property
     def is_available(self):

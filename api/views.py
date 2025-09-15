@@ -13,7 +13,7 @@ from api.serializers import CategorySerializer, ProductSerializer
 
 @api_view(["GET"])
 def featured_products_listing(req: Request):
-    products = Product.objects.all()
+    products = Product.objects.filter(is_featured=True)
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 
@@ -22,7 +22,12 @@ class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [SearchFilter]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [permissions.AllowAny]
+        return super().get_permissions()
 
     def get_queryset(self):
         slug = self.request.query_params.get("category")  # type:ignore
@@ -38,7 +43,12 @@ class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_url_kwarg = "slug"
-    # permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [permissions.AllowAny]
+        return super().get_permissions()
 
     def retrieve(self, request, slug=None):
         category = get_object_or_404(Category, slug=slug)
