@@ -26,7 +26,7 @@ class ProductViewSet(ModelViewSet):
     lookup_url_kwarg = "slug"
 
     def get_queryset(self):
-        slug = self.request.query_params.get("category")
+        slug = self.request.query_params.get("category")  # type:ignore
 
         if slug:
             category = get_object_or_404(Category, slug=slug)
@@ -34,16 +34,12 @@ class ProductViewSet(ModelViewSet):
 
         return self.queryset
 
-    # def retrieve(self, request, slug=None):
-    #     product = get_object_or_404(Product, slug=slug)
-    #     serializer = ProductSerializer(product)
-
 
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_url_kwarg = "slug"
-    # permission_classes = [permissions.IsAuhenticated, permissions.IsAdminUser]
+    # permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
     def retrieve(self, request, slug=None):
         category = get_object_or_404(Category, slug=slug)
