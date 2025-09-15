@@ -23,7 +23,6 @@ class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     filter_backends = [SearchFilter]
     permission_classes = [permissions.AllowAny]
-    lookup_url_kwarg = "slug"
 
     def get_queryset(self):
         slug = self.request.query_params.get("category")  # type:ignore
