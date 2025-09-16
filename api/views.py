@@ -9,6 +9,37 @@ from rest_framework.viewsets import ModelViewSet
 
 from api.models import Category, Product
 from api.serializers import CategorySerializer, ProductSerializer
+from api.auth import obtain_token_for_user
+
+
+@api_view(["GET"])
+def index(req: Request):
+    """
+    View that welcomes the user and redirects them to the Swagger API documentation.
+
+    Args:
+        req (Request): The incoming HTTP request.
+
+    Returns:
+        Response: An HTTP response that redirects the user to the Swagger API docs.
+    """
+    return Response("")
+
+
+# @api_view(['POST'])
+# def register(req: Request):
+#     email, password = req.data['email'], req.data['password']  # type:ignore
+
+#     user = User(email=email, password=password)
+#     user.save()
+
+#     return Response(obtain_token_for_user(email, password))
+
+
+# @api_view(['POST'])
+# def login(req: Request):
+#     data = req.data
+#     return Response(obtain_token_for_user(data['email'], data['password']))
 
 
 @api_view(["GET"])
@@ -36,16 +67,6 @@ def featured_products_listing(req: Request):
     products = Product.objects.filter(is_featured=True)
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
-
-
-@api_view(['POST'])
-def register(req: Request):
-    pass
-
-
-@api_view(['POST'])
-def login(req: Request):
-    pass
 
 
 class ProductViewSet(ModelViewSet):
