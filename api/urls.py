@@ -15,8 +15,8 @@ router.register(r"categories", CategoryViewSet, basename="categories_listing")
 
 
 urlpatterns = [
-    path("", featured_products_listing, name="featured_products"),
-    path("token/", TokenObtainPairView.as_view(), name="token_obatain_pair"),
+    path("featured", featured_products_listing, name="featured_products"),
+    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(

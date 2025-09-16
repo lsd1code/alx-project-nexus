@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.filters import SearchFilter
@@ -67,10 +67,12 @@ class ProductViewSet(ModelViewSet):
         get_permissions(self): Returns the permission classes based on the request method.
         get_queryset(self): Returns the queryset, optionally filtered by category slug.
     """
+
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [SearchFilter]
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    search_fields = ['name', 'slug']
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -111,6 +113,7 @@ class CategoryViewSet(ModelViewSet):
             - Returns:
                 Response: Serialized data of products belonging to the specified Category.
     """
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_url_kwarg = "slug"
