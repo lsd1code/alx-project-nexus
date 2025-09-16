@@ -32,7 +32,7 @@
     + ["/accounts/order-history/{order_id}", "GET", "Get specific order details", "auth required"]
 
 - Product Catalogue 
-    + ["/", "GET", "Homepage with featured products", "No auth"]
+    + ["/featured", "GET", "Homepage with featured products", "No auth"]
     + ["/products/", "GET", "All products listing", "No auth"]
     + ["/products/{product_id}", "GET", "Individual product details", "No auth"]
     + ["/products/?category={slug}", "GET", "Products filtered by category", "No auth"]

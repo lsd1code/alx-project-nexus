@@ -1,39 +1,12 @@
 import uuid
-
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
-from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
-from api.managers import CustomUserManage
+from api.managers import CustomUserManager
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(_("email address"), unique=True)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(auto_now=True)
-
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["email", "password"]
-
-    objects = CustomUserManage()
-
-    groups = models.ManyToManyField(
-        "auth.Group",
-        blank=True,
-        related_name="api_user_set",
-        related_query_name="user",
-        help_text="The groups this user belongs to. A user will get all permissions granted to each of their group.",
-    )
-
-    user_permissions = models.ManyToManyField(
-        "auth.Permission",
-        blank=True,
-        related_name="api_user_permissions",
-        related_query_name="user",
-        help_text="Specific permissions for this user.",
-    )
+class User(AbstractBaseUser):
+    pass
 
 
 class Category(models.Model):
@@ -50,12 +23,15 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True)
     stock = models.PositiveIntegerField()
     category = models.ForeignKey(
         Category, on_delete=models.DO_NOTHING, related_name="products"
     )
-    image = models.ImageField(upload_to="product_images/", blank=True, null=True)
+    image = models.ImageField(
+        upload_to="product_images/", blank=True, null=True)
+    is_featured = models.BooleanField(default=False)
 
     @property
     def is_available(self):
@@ -71,7 +47,8 @@ class Order(models.Model):
         CONFIRMED = "CONFIRMED"
         CANCELLED = "CANCELLED"
 
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="orders")
+    user = models.ForeignKey(
+        User, on_delete=models.DO_NOTHING, related_name="orders", null=True)
     order_date = models.DateTimeField(auto_now=True)
     status = models.CharField(
         max_length=255, choices=OrderStatusChoices, default=OrderStatusChoices.PENDING
@@ -79,7 +56,7 @@ class Order(models.Model):
     transaction_id = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.id} - {self.user.id}"
+        return f"{self.id}"  # type:ignore
 
 
 class OrderItem(models.Model):
@@ -106,4 +83,4 @@ class ShippingAddress(models.Model):
     zip_code = models.CharField(max_length=6)
 
     def __str__(self):
-        return f"{self.order.id}: {self.address}"
+        return f"{self.order.id}: {self.address}"  # type:ignore
