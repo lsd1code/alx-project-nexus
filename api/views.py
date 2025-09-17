@@ -6,10 +6,23 @@ from rest_framework.filters import SearchFilter
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework import generics
+
+from rest_framework.reverse import reverse
 
 from api.models import Category, Product
 from api.serializers import CategorySerializer, ProductSerializer
 from api.auth import obtain_token_for_user
+
+
+@api_view(['POST'])
+def register(req: Request):
+    return Response("user registration")
+
+
+@api_view(['POST'])
+def login(req: Request):
+    return Response("user registration")
 
 
 @api_view(["GET"])
@@ -23,50 +36,28 @@ def index(req: Request):
     Returns:
         Response: An HTTP response that redirects the user to the Swagger API docs.
     """
-    return Response("")
+    return Response(reverse("swagger-ui"))
 
 
-# @api_view(['POST'])
-# def register(req: Request):
-#     email, password = req.data['email'], req.data['password']  # type:ignore
-
-#     user = User(email=email, password=password)
-#     user.save()
-
-#     return Response(obtain_token_for_user(email, password))
-
-
-# @api_view(['POST'])
-# def login(req: Request):
-#     data = req.data
-#     return Response(obtain_token_for_user(data['email'], data['password']))
-
-
-@api_view(["GET"])
-def featured_products_listing(req: Request):
+class FeaturedProducts(generics.ListAPIView):
     """
-    Retrieves a list of featured products.
+    API view to retrieve a list of featured products.
 
-    This view filters the Product queryset to include only products marked as featured
-    (`is_featured=True`). The resulting queryset is serialized using the `ProductSerializer`
-    and returned as a response.
+    This view returns all products that are marked as featured (`is_featured=True`).
+    It uses the `ProductSerializer` to serialize the product data and allows unrestricted access
+    to any user (no authentication required).
 
-    Args:
-        req (Request): The HTTP request object.
+    Attributes:
+        queryset (QuerySet): The queryset of featured products.
+        serializer_class (Serializer): The serializer used for product representation.
+        permission_classes (list): List of permission classes applied to the view.
 
-    Returns:
-        Response: A response object containing serialized data of featured products.
-
-    Raises:
-        None
-
-    Example:
-        GET /api/featured-products/
-        Returns a JSON array of featured products.
+    Methods:
+        get(request, *args, **kwargs): Returns a list of featured products.
     """
-    products = Product.objects.filter(is_featured=True)
-    serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data)
+    queryset = Product.objects.filter(is_featured=True)
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.AllowAny]
 
 
 class ProductViewSet(ModelViewSet):
@@ -88,7 +79,6 @@ class ProductViewSet(ModelViewSet):
         get_permissions(self): Returns the permission classes based on the request method.
         get_queryset(self): Returns the queryset, optionally filtered by category slug.
     """
-
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [SearchFilter]
@@ -134,7 +124,6 @@ class CategoryViewSet(ModelViewSet):
             - Returns:
                 Response: Serialized data of products belonging to the specified Category.
     """
-
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_url_kwarg = "slug"

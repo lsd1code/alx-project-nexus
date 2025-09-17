@@ -8,6 +8,12 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# cloudinary
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -27,6 +33,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "django_filters",
+    "cloudinary",
     "api",
 ]
 
@@ -68,8 +75,8 @@ DATABASES = {
         "USER": os.getenv("POSTGRES_DB_USER"),
         "NAME": os.getenv("POSTGRES_DB_NAME"),
         "PASSWORD": os.getenv("POSTGRES_DB_PASSWORD"),
-        "HOST": os.getenv("POSTGRES_DB_HOST"),  # Or your PostgreSQL host
-        "PORT": os.getenv("POSTGRES_DB_PORT"),  # Or your PostgreSQL port
+        "HOST": os.getenv("POSTGRES_DB_HOST"),
+        "PORT": os.getenv("POSTGRES_DB_PORT"), 
     }
 }
 
@@ -131,6 +138,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
+#! JWT Settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
@@ -142,3 +150,12 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
+
+#? Cloudinary - Django integration 
+cloudinary.config(
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key = os.getenv("CLOUDINARY_API_KEY"),
+    api_secret = os.getenv("CLOUDINARY_API_SECRET")
+)
+
+

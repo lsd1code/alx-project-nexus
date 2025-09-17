@@ -23,28 +23,30 @@
 2. API Endpoints Reference
 
 - Authentication & User Management
-    + ["/accounts/register", "POST", "Create new user acc", "No auth"]
-    + ["/accounts/login", "POST", "User Authentication", "No auth"]
-    + ["/accounts/logout", "POST", "Logout user", "auth required"]
-    + ["/accounts/profile", "GET", "User profile page", "auth required"]
-    + ["/accounts/profile", "POST", "Update user profile", "auth required"]
-    + ["/accounts/order-history", "GET", "User's order history", "auth required"]
-    + ["/accounts/order-history/{order_id}", "GET", "Get specific order details", "auth required"]
+    + ["accounts/register/", "POST", "Create new user acc", "No auth"]
+    + ["accounts/login/", "POST", "User Authentication", "No auth"]
+    + ["accounts/logout/", "POST", "Logout user", "auth required"]
+    + ["accounts/profile/", "GET", "User profile page", "auth required"]
+    + ["accounts/profile/", "PUT", "Update user profile", "auth required"]
 
 - Product Catalogue 
-    + ["/featured", "GET", "Homepage with featured products", "No auth"]
-    + ["/products/", "GET", "All products listing", "No auth"]
-    + ["/products/{product_id}", "GET", "Individual product details", "No auth"]
-    + ["/products/?category={slug}", "GET", "Products filtered by category", "No auth"]
-    + ["/products/?search={value}", "GET", "Products matching search query", "No auth"]
-    + ["/categories/", "GET", "all categories listing", "No auth"]
-    + ["/categories/{slug}", "GET", "Products in a specific category", "No auth"]
+    + ["featured-products/", "GET", "Homepage with featured products", "No auth"]
+    + ["products/", "GET", "All products listing", "No auth"]
+    + ["products/{product_id}/", "GET", "Individual product details", "No auth"]
+    + ["products/?category={slug}/", "GET", "Products filtered by category", "No auth"]
+    + ["products/?search={value}/", "GET", "Products matching search query", "No auth"]
+    + ["categories/", "GET", "all categories listing", "No auth"]
+    + ["categories/{slug}/", "GET", "Products in a specific category", "No auth"]
 
 - Shopping Cart
-    + ["/cart/", "GET", "View cart contents", "no auth(session managed)"]
-    + ["/cart/add/{product_id}", "POST", "Add item to cart", "no auth(session managed)"]
-    + ["/cart/update/{item_id}", "GET", "Update item quantity", "no auth(session managed)"]
-    + ["/cart/remove/{item_id}", "GET", "View cart contents", "no auth(session managed)"]
+    + ["cart/", "GET", "View cart contents", "no auth(session managed)"]
+    + ["cart/add/{product_id}", "POST", "Add item to cart", "no auth(session managed)"]
+    + ["cart/update/{item_id}", "GET", "Update item quantity", "no auth(session managed)"]
+    + ["cart/remove/{item_id}", "GET", "View cart contents", "no auth(session managed)"]
+
+- Order History
+    + ["accounts/orders/", "GET", "User's order history", "auth required"]
+    + ["accounts/orders/{order_id}/", "GET", "Get specific order details", "auth required"]
 
 
     

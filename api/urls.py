@@ -7,7 +7,9 @@ from drf_spectacular.views import (
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from api.views import CategoryViewSet, ProductViewSet, featured_products_listing
+from api.views import CategoryViewSet, ProductViewSet, FeaturedProducts
+
+
 router = DefaultRouter()
 router.register(r"products", ProductViewSet, basename="products_listing")
 router.register(r"categories", CategoryViewSet, basename="categories_listing")
@@ -16,7 +18,9 @@ router.register(r"categories", CategoryViewSet, basename="categories_listing")
 urlpatterns = [
     # path("auth/register", register, name="register"),
     # path("auth/login", login, name="login"),
-    path("featured", featured_products_listing, name="featured_products"),
+    path(
+        "featured-products/", FeaturedProducts.as_view(), name="featured_products"
+    ),
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),

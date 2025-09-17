@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from cloudinary.models import CloudinaryField
 
 from api.managers import CustomUserManager
 
@@ -29,8 +30,7 @@ class Product(models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.DO_NOTHING, related_name="products"
     )
-    image = models.ImageField(
-        upload_to="product_images/", blank=True, null=True)
+    image = CloudinaryField('image', null=True, blank=True)
     is_featured = models.BooleanField(default=False)
 
     @property

@@ -465,11 +465,11 @@ class Command(BaseCommand):
     featured_indices = random.sample(range(len(products)), 10)
 
     def handle(self, *args, **kwargs):
-        User.objects.create(
-            email="erenyeager@mail.com",
-            password="password",
-            is_superuser=False,
-        )
+        # User.objects.create(
+        #     email="erenyeager@mail.com",
+        #     password="password",
+        #     is_superuser=False,
+        # )
 
         for cat in self.categories:
             Category(
