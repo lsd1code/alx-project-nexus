@@ -38,15 +38,16 @@
     + ["categories/", "GET", "all categories listing", "No auth"]
     + ["categories/{slug}/", "GET", "Products in a specific category", "No auth"]
 
-- Shopping Cart
-    + ["cart/", "GET", "View cart contents", "no auth(session managed)"]
-    + ["cart/add/{product_id}", "POST", "Add item to cart", "no auth(session managed)"]
-    + ["cart/update/{item_id}", "GET", "Update item quantity", "no auth(session managed)"]
-    + ["cart/remove/{item_id}", "GET", "View cart contents", "no auth(session managed)"]
-
 - Order History
     + ["accounts/orders/", "GET", "User's order history", "auth required"]
     + ["accounts/orders/{order_id}/", "GET", "Get specific order details", "auth required"]
+
+- Shopping Cart (Frontend)
+    + ["cart/", "GET", "View cart contents", "no auth(session managed)"]
+    + ["cart/add/{product_id}", "POST", "Add item to cart", "no auth(session managed)"]
+    + ["cart/remove/{item_id}", "DELETE", "View cart contents", "no auth(session managed)"]
+
+
 
 
     

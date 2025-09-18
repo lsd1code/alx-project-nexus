@@ -7,17 +7,26 @@ from drf_spectacular.views import (
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from api.views import CategoryViewSet, ProductViewSet, FeaturedProducts
+from api.views import (
+    CategoryViewSet,
+    ProductViewSet,
+    FeaturedProducts,
+    # OrderViewSet
+)
 
 
 router = DefaultRouter()
-router.register(r"products", ProductViewSet, basename="products_listing")
-router.register(r"categories", CategoryViewSet, basename="categories_listing")
+router.register(r"products", ProductViewSet, basename="product")
+router.register(r"categories", CategoryViewSet, basename="category")
+
+# todo: add nested path to get products related to the order
+# router.register(r"orders", OrderViewSet, basename="order")
 
 
 urlpatterns = [
-    # path("auth/register", register, name="register"),
-    # path("auth/login", login, name="login"),
+    # path(
+    #     "orders/", OrderListAPIView.as_view(), name="order_list"
+    # ),
     path(
         "featured-products/", FeaturedProducts.as_view(), name="featured_products"
     ),

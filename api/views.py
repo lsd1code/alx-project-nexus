@@ -1,4 +1,8 @@
 from django.shortcuts import get_object_or_404
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+
 from rest_framework.filters import SearchFilter
 from rest_framework import permissions
 from rest_framework.decorators import api_view
@@ -7,12 +11,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics
-
 from rest_framework.reverse import reverse
+from rest_framework import status
 
-from api.models import Category, Product
-from api.serializers import CategorySerializer, ProductSerializer
-from api.auth import obtain_token_for_user
+from api.models import Category, Product, Order, OrderItem, ShippingAddress
+from api.serializers import CategorySerializer, ProductSerializer, OrderSerializer, OrderItemSerializer
 
 
 @api_view(['POST'])
@@ -59,6 +62,10 @@ class FeaturedProducts(generics.ListAPIView):
     serializer_class = ProductSerializer
     permission_classes = [permissions.AllowAny]
 
+    @method_decorator(cache_page(60 * 15, key_prefix="product_list"))
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 
 class ProductViewSet(ModelViewSet):
     """
@@ -82,8 +89,16 @@ class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [SearchFilter]
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     search_fields = ['name', 'slug']
+    permission_classes = [
+        permissions.IsAuthenticated,
+        permissions.IsAdminUser
+    ]
+
+    # key-prefix: used as the key prefix for the cached api responses
+    @method_decorator(cache_page(60 * 15, key_prefix="product_list"))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -127,12 +142,18 @@ class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_url_kwarg = "slug"
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        permissions.IsAdminUser
+    ]
 
     def get_permissions(self):
         if self.request.method == 'GET':
             self.permission_classes = [permissions.AllowAny]
         return super().get_permissions()
+
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, slug=None):
         category = get_object_or_404(Category, slug=slug)
@@ -140,3 +161,67 @@ class CategoryViewSet(ModelViewSet):
         products_serializer = ProductSerializer(products, many=True)
 
         return Response(products_serializer.data)
+
+
+# class OrderViewSet(ModelViewSet):
+#     """
+#     OrderViewSet handles CRUD operations for Order objects, restricted to authenticated users.
+#     This viewset provides the following functionality:
+#     - Lists orders belonging to the authenticated user.
+#     - Allows creation of new orders with associated shipping address and order items.
+#     - Ensures only authenticated users can access order endpoints.
+#     Methods:
+#         get_queryset(self):
+#             Returns a queryset filtered to orders belonging to the current user.
+#         create(self, request, *args, **kwargs):
+#             Creates a new order for the authenticated user.
+#             Expects 'products' (list of product_id and quantity) and 'shipping_address' (address details) in request data.
+#             Validates input, creates ShippingAddress, Order, and OrderItem instances.
+#             Returns order ID and success message on completion.
+#     Attributes:
+#         queryset: All Order objects.
+#         serializer_class: Serializer for Order objects.
+#         permission_classes: Restricts access to authenticated users only.
+#     Raises:
+#         Returns HTTP 400 Bad Request if required fields are missing in request data.
+#     """
+#     queryset = Order.objects.all()
+#     serializer_class = OrderSerializer
+#     permission_classes = [
+#         permissions.IsAuthenticated
+#     ]
+
+#     def get_queryset(self):
+#         user = self.request.user
+#         return super().get_queryset().filter(user=user)
+
+#     def create(self, request, *args, **kwargs):
+#         data = request.data
+
+#         if not "products" in data or not "shipping_address" in data:
+#             return Response("Bad Request", status.HTTP_400_BAD_REQUEST)
+
+#         user = request.user
+#         user_products = data['products']
+#         user_shipping_address = data['shipping_address']
+
+#         shipping_address = ShippingAddress.objects.create(
+#             address=user_shipping_address['address'],
+#             city=user_shipping_address['city'],
+#             state=user_shipping_address['state'],
+#             zip_code=user_shipping_address['zip_code'],
+#         )
+#         order = Order(
+#             user=user, shipping_address=shipping_address
+#         )
+#         order.save()
+
+#         for p in user_products:
+#             product = Product.objects.get(pk=p['product_id'])
+#             quantity = p['quantity']
+
+#             OrderItem.objects.create(
+#                 product=product, order=order, quantity=quantity
+#             )
+
+#         return Response({"order_id": order.id, "message": "Order Created Successfully"})
