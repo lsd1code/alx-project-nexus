@@ -163,65 +163,79 @@ class CategoryViewSet(ModelViewSet):
         return Response(products_serializer.data)
 
 
-# class OrderViewSet(ModelViewSet):
-#     """
-#     OrderViewSet handles CRUD operations for Order objects, restricted to authenticated users.
-#     This viewset provides the following functionality:
-#     - Lists orders belonging to the authenticated user.
-#     - Allows creation of new orders with associated shipping address and order items.
-#     - Ensures only authenticated users can access order endpoints.
-#     Methods:
-#         get_queryset(self):
-#             Returns a queryset filtered to orders belonging to the current user.
-#         create(self, request, *args, **kwargs):
-#             Creates a new order for the authenticated user.
-#             Expects 'products' (list of product_id and quantity) and 'shipping_address' (address details) in request data.
-#             Validates input, creates ShippingAddress, Order, and OrderItem instances.
-#             Returns order ID and success message on completion.
-#     Attributes:
-#         queryset: All Order objects.
-#         serializer_class: Serializer for Order objects.
-#         permission_classes: Restricts access to authenticated users only.
-#     Raises:
-#         Returns HTTP 400 Bad Request if required fields are missing in request data.
-#     """
-#     queryset = Order.objects.all()
-#     serializer_class = OrderSerializer
-#     permission_classes = [
-#         permissions.IsAuthenticated
-#     ]
+class OrderViewSet(ModelViewSet):
+    """
+    OrderViewSet handles CRUD operations for Order objects, restricted to authenticated users.
+    This viewset provides the following functionality:
+    - Lists orders belonging to the authenticated user.
+    - Allows creation of new orders with associated shipping address and order items.
+    - Ensures only authenticated users can access order endpoints.
+    Methods:
+        get_queryset(self):
+            Returns a queryset filtered to orders belonging to the current user.
+        create(self, request, *args, **kwargs):
+            Creates a new order for the authenticated user.
+            Expects 'products' (list of product_id and quantity) and 'shipping_address' (address details) in request data.
+            Validates input, creates ShippingAddress, Order, and OrderItem instances.
+            Returns order ID and success message on completion.
+    Attributes:
+        queryset: All Order objects.
+        serializer_class: Serializer for Order objects.
+        permission_classes: Restricts access to authenticated users only.
+    Raises:
+        Returns HTTP 400 Bad Request if required fields are missing in request data.
+    """
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
 
-#     def get_queryset(self):
-#         user = self.request.user
-#         return super().get_queryset().filter(user=user)
+    def get_queryset(self):
+        user = self.request.user
+        return super().get_queryset().filter(user=user)
 
-#     def create(self, request, *args, **kwargs):
-#         data = request.data
+    # TODO: Return order items instead of order_ids
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
-#         if not "products" in data or not "shipping_address" in data:
-#             return Response("Bad Request", status.HTTP_400_BAD_REQUEST)
+    def create(self, request, *args, **kwargs):
+        data = request.data
 
-#         user = request.user
-#         user_products = data['products']
-#         user_shipping_address = data['shipping_address']
+        if not "products" in data or not "shipping_address" in data:
+            return Response("Bad Request", status.HTTP_400_BAD_REQUEST)
 
-#         shipping_address = ShippingAddress.objects.create(
-#             address=user_shipping_address['address'],
-#             city=user_shipping_address['city'],
-#             state=user_shipping_address['state'],
-#             zip_code=user_shipping_address['zip_code'],
-#         )
-#         order = Order(
-#             user=user, shipping_address=shipping_address
-#         )
-#         order.save()
+        user = request.user
+        user_products = data['products']
+        user_shipping_address = data['shipping_address']
 
-#         for p in user_products:
-#             product = Product.objects.get(pk=p['product_id'])
-#             quantity = p['quantity']
+        shipping_address = ShippingAddress.objects.create(
+            address=user_shipping_address['address'],
+            city=user_shipping_address['city'],
+            state=user_shipping_address['state'],
+            zip_code=user_shipping_address['zip_code'],
+        )
+        order = Order(
+            user=user, shipping_address=shipping_address
+        )
+        order.save()
 
-#             OrderItem.objects.create(
-#                 product=product, order=order, quantity=quantity
-#             )
+        total_price = 0
 
-#         return Response({"order_id": order.id, "message": "Order Created Successfully"})
+        for prod in user_products:
+            product = Product.objects.get(pk=prod['product_id'])
+            quantity = prod['quantity']
+
+            order_item = OrderItem.objects.create(
+                product=product, order=order, quantity=quantity
+            )
+            total_price += order_item.subtotal
+
+        return Response(
+            {
+                "order_id": order.id,
+                "message": "Order Created Successfully",
+                "total_price": total_price
+            },
+            status=status.HTTP_201_CREATED
+        )

@@ -11,22 +11,19 @@ from api.views import (
     CategoryViewSet,
     ProductViewSet,
     FeaturedProducts,
-    # OrderViewSet
+    OrderViewSet
 )
 
 
 router = DefaultRouter()
-router.register(r"products", ProductViewSet, basename="product")
-router.register(r"categories", CategoryViewSet, basename="category")
+router.register(r"products", ProductViewSet, basename="products")
+router.register(r"categories", CategoryViewSet, basename="categories")
 
 # todo: add nested path to get products related to the order
-# router.register(r"orders", OrderViewSet, basename="order")
+router.register(r"orders", OrderViewSet, basename="orders")
 
 
 urlpatterns = [
-    # path(
-    #     "orders/", OrderListAPIView.as_view(), name="order_list"
-    # ),
     path(
         "featured-products/", FeaturedProducts.as_view(), name="featured_products"
     ),
