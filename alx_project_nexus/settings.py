@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "cloudinary",
+    "silk",
     "api",
 ]
 
@@ -42,6 +43,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "silk.middleware.SilkyMiddleware",
 ]
 
 ROOT_URLCONF = "alx_project_nexus.urls"
@@ -158,7 +160,7 @@ CACHES = {
 }
 
 
-#! JWT Settings
+# JWT Settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
@@ -171,7 +173,7 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
-#! Cloudinary - Django integration
+# Cloudinary - Django integration
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),

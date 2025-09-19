@@ -28,7 +28,8 @@ class ProductSerializer(ModelSerializer):
             "price",
             "stock",
             "is_featured",
-            "category"
+            "category",
+            "is_available",
         ]
 
 
@@ -44,7 +45,7 @@ class OrderSerializer(ModelSerializer):
             'products',
             'shipping_address',
             'order_date',
-            'transaction_id'
+            'transaction_id',
         ]
 
 

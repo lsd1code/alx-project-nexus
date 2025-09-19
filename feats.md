@@ -4,7 +4,7 @@
 
 - Public users (no login required)
     + view paginated page list of available products
-    + filter and search products by `category`, `price range`, or `name`
+    + filter and search products by `category`, or `name`
     + view detailed product pages with `descriptions`, `images`, and `stock status`
     + add products to a shopping cart
     + view and update their cart (change quatities, remove items)
@@ -38,9 +38,11 @@
     + ["categories/", "GET", "all categories listing", "No auth"]
     + ["categories/{slug}/", "GET", "Products in a specific category", "No auth"]
 
-- Order History
-    + ["accounts/orders/", "GET", "User's order history", "auth required"]
-    + ["accounts/orders/{order_id}/", "GET", "Get specific order details", "auth required"]
+- Orders
+    + ["orders/", "GET", "User's order history", "auth required"]
+    + ["orders/", "POST", "Create new user order", "auth required"]
+    + ["orders/{order_id}/", "GET", "Get specific order details", "auth required"]
+    + ["orders/{order_id}/", "DELETE", "Delete specific order", "auth required"]
 
 - Shopping Cart (Frontend)
     + ["cart/", "GET", "View cart contents", "no auth(session managed)"]

@@ -94,7 +94,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     product = models.ForeignKey(
-        Product, on_delete=models.DO_NOTHING, related_name="order_items"
+        Product, on_delete=models.DO_NOTHING
     )
     order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name="order_items"

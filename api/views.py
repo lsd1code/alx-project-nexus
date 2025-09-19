@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.shortcuts import get_object_or_404
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
@@ -15,7 +16,7 @@ from rest_framework.reverse import reverse
 from rest_framework import status
 
 from api.models import Category, Product, Order, OrderItem, ShippingAddress
-from api.serializers import CategorySerializer, ProductSerializer, OrderSerializer, OrderItemSerializer
+from api.serializers import CategorySerializer, ProductSerializer, OrderSerializer
 
 
 @api_view(['POST'])
@@ -43,21 +44,6 @@ def index(req: Request):
 
 
 class FeaturedProducts(generics.ListAPIView):
-    """
-    API view to retrieve a list of featured products.
-
-    This view returns all products that are marked as featured (`is_featured=True`).
-    It uses the `ProductSerializer` to serialize the product data and allows unrestricted access
-    to any user (no authentication required).
-
-    Attributes:
-        queryset (QuerySet): The queryset of featured products.
-        serializer_class (Serializer): The serializer used for product representation.
-        permission_classes (list): List of permission classes applied to the view.
-
-    Methods:
-        get(request, *args, **kwargs): Returns a list of featured products.
-    """
     queryset = Product.objects.filter(is_featured=True)
     serializer_class = ProductSerializer
     permission_classes = [permissions.AllowAny]
@@ -68,24 +54,6 @@ class FeaturedProducts(generics.ListAPIView):
 
 
 class ProductViewSet(ModelViewSet):
-    """
-    A viewset for viewing and editing Product instances.
-    This viewset provides the following functionality:
-    - Lists all products or filters products by category slug via query parameter.
-    - Uses `ProductSerializer` for serialization.
-    - Allows search filtering.
-    - Restricts access to authenticated admin users by default, but allows unrestricted access for GET requests.
-    - Overrides `get_permissions` to allow public access for GET requests.
-    - Overrides `get_queryset` to support filtering products by category slug.
-    Attributes:
-        queryset (QuerySet): The base queryset of all Product instances.
-        serializer_class (Serializer): The serializer class for Product.
-        filter_backends (list): List of filter backends to use for filtering.
-        permission_classes (list): List of permission classes for access control.
-    Methods:
-        get_permissions(self): Returns the permission classes based on the request method.
-        get_queryset(self): Returns the queryset, optionally filtered by category slug.
-    """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [SearchFilter]
@@ -116,29 +84,6 @@ class ProductViewSet(ModelViewSet):
 
 
 class CategoryViewSet(ModelViewSet):
-    """
-    A viewset for handling Category objects and their related Products.
-    This viewset provides CRUD operations for Category instances, with custom permission handling:
-    - Allows any user to perform GET requests (list and retrieve).
-    - Restricts other methods (POST, PUT, DELETE) to authenticated admin users.
-    Attributes:
-        queryset (QuerySet): All Category objects.
-        serializer_class (Serializer): Serializer for Category objects.
-        lookup_url_kwarg (str): URL keyword argument used to look up Category by slug.
-        permission_classes (list): Default permissions (authenticated admin users).
-    Methods:
-        get_permissions():
-            Dynamically sets permissions based on request method.
-            - GET requests are allowed for any user.
-            - Other methods require admin authentication.
-        retrieve(request, slug=None):
-            Retrieves a Category by slug and returns serialized data for all Products in that Category.
-            - Args:
-                request (Request): The HTTP request object.
-                slug (str, optional): The slug of the Category to retrieve.
-            - Returns:
-                Response: Serialized data of products belonging to the specified Category.
-    """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_url_kwarg = "slug"
@@ -164,27 +109,6 @@ class CategoryViewSet(ModelViewSet):
 
 
 class OrderViewSet(ModelViewSet):
-    """
-    OrderViewSet handles CRUD operations for Order objects, restricted to authenticated users.
-    This viewset provides the following functionality:
-    - Lists orders belonging to the authenticated user.
-    - Allows creation of new orders with associated shipping address and order items.
-    - Ensures only authenticated users can access order endpoints.
-    Methods:
-        get_queryset(self):
-            Returns a queryset filtered to orders belonging to the current user.
-        create(self, request, *args, **kwargs):
-            Creates a new order for the authenticated user.
-            Expects 'products' (list of product_id and quantity) and 'shipping_address' (address details) in request data.
-            Validates input, creates ShippingAddress, Order, and OrderItem instances.
-            Returns order ID and success message on completion.
-    Attributes:
-        queryset: All Order objects.
-        serializer_class: Serializer for Order objects.
-        permission_classes: Restricts access to authenticated users only.
-    Raises:
-        Returns HTTP 400 Bad Request if required fields are missing in request data.
-    """
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [
@@ -195,9 +119,18 @@ class OrderViewSet(ModelViewSet):
         user = self.request.user
         return super().get_queryset().filter(user=user)
 
-    # TODO: Return order items instead of order_ids
     def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
+        order = Order.objects.get(pk=kwargs['pk'])
+        order_items = OrderItem.objects.filter(order=order)
+        total_price = 0
+
+        for item in order_items:
+            total_price += item.subtotal
+
+        data = super().retrieve(request, *args, **kwargs).data
+        data['total_price'] = total_price  # type:ignore
+
+        return Response(data, status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -230,7 +163,6 @@ class OrderViewSet(ModelViewSet):
                 product=product, order=order, quantity=quantity
             )
             total_price += order_item.subtotal
-
         return Response(
             {
                 "order_id": order.id,
