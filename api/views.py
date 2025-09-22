@@ -154,9 +154,8 @@ class OrderViewSet(ModelViewSet):
             state=user_shipping_address['state'],
             zip_code=user_shipping_address['zip_code'],
         )
-        order = Order(
-            user=user, shipping_address=shipping_address
-        )
+
+        order = Order(user=user, shipping_address=shipping_address)
         order.save()
 
         total_price = 0
@@ -168,6 +167,7 @@ class OrderViewSet(ModelViewSet):
             order_item = OrderItem.objects.create(
                 product=product, order=order, quantity=quantity
             )
+            
             total_price += order_item.subtotal
         return Response(
             {
