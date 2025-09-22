@@ -19,9 +19,7 @@ router = DefaultRouter()
 router.register(r"products", ProductViewSet, basename="products")
 router.register(r"categories", CategoryViewSet, basename="categories")
 
-# todo: add nested path to get products related to the order
 router.register(r"orders", OrderViewSet, basename="orders")
-
 
 urlpatterns = [
     path(

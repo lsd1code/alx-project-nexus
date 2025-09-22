@@ -8,18 +8,17 @@ from django.core.cache import cache
 @receiver([post_save, post_delete], sender=Product)
 def cache_invalidation(sender, instance, **kwargs):
     """
-    Signal receiver that invalidates cache when a Product instance is saved or deleted.
+    Signal handler to invalidate cached product list data.
 
-    This function listens to both the post_save and post_delete signals for the Product model.
-    When triggered, it prints a message indicating that the cache is being cleared.
+    This function deletes all cache entries matching the pattern "*product_list*".
+    It is intended to be connected to model signals (e.g., post_save, post_delete)
+    to ensure that cached product lists are refreshed when relevant model instances
+    are created, updated, or deleted.
 
     Args:
-        sender (Model): The model class that sent the signal (Product).
-        instance (Product): The instance of Product that was saved or deleted.
+        sender: The model class that sent the signal.
+        instance: The instance of the model that triggered the signal.
         **kwargs: Additional keyword arguments passed by the signal.
     """
-
-    #! Clear Product List Cache
     cache.delete_pattern("*product_list*")  # type: ignore
 
-    print("CLEARING CACHE...")

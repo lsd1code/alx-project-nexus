@@ -113,7 +113,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = "static/"
 
 # Default primary key field type
@@ -148,7 +147,7 @@ REST_FRAMEWORK = {
     },
 }
 
-#! Rate-limit and Cache settings
+# Rate-limit and Cache settings
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -160,12 +159,12 @@ CACHES = {
 }
 
 
-# JWT Settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
 }
 
+# API Documentation
 SPECTACULAR_SETTINGS = {
     "TITLE": "ALX Project Nexus: E-Commerce API",
     "DESCRIPTION": "The e-commerce backend simulates a real-world development environment, emphasizing scalability, security, and performance. Participants will: - Design and optimize relational database schemas.",
@@ -173,7 +172,7 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
-# Cloudinary - Django integration
+# Cloudinary - Django integration (Images upload/retrieval)
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),

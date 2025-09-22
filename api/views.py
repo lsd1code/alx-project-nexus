@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 
 from rest_framework.filters import SearchFilter
 from rest_framework import permissions
@@ -118,6 +119,11 @@ class OrderViewSet(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return super().get_queryset().filter(user=user)
+
+    @method_decorator(cache_page(60 * 15, key_prefix="order_list"))
+    @method_decorator(vary_on_headers("Authorization"))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         order = Order.objects.get(pk=kwargs['pk'])
