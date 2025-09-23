@@ -46,6 +46,10 @@ class Product(models.Model):
     image = CloudinaryField('image', null=True, blank=True)
     is_featured = models.BooleanField(default=False)
 
+    is_hot = models.BooleanField(default=False, null=True)
+    sale_percentage = models.DecimalField(
+        max_digits=2, decimal_places=2, null=True)
+
     @property
     def is_available(self):
         return self.stock > 0
