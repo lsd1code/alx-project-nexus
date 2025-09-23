@@ -1,11 +1,12 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from api.views import (
     CategoryViewSet,
@@ -18,8 +19,6 @@ from api.views import (
 router = DefaultRouter()
 router.register(r"products", ProductViewSet, basename="products")
 router.register(r"categories", CategoryViewSet, basename="categories")
-
-# todo: add nested path to get products related to the order
 router.register(r"orders", OrderViewSet, basename="orders")
 
 

@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, BooleanField
 
 from api.models import Category, Order, OrderItem, Product, ShippingAddress
 
@@ -17,6 +17,7 @@ class CategorySerializer(ModelSerializer):
 
 class ProductSerializer(ModelSerializer):
     category = CategorySerializer()
+    is_available = BooleanField()
 
     class Meta:
         model = Product

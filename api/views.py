@@ -44,16 +44,54 @@ def index(req: Request):
 
 
 class FeaturedProducts(generics.ListAPIView):
+    """
+    ListAPIView that returns featured Product instances.
+    This view serves a read-only, paginated list of products with the is_featured flag set to True.
+    It uses ProductSerializer to serialize Product objects and allows unrestricted access (AllowAny).
+    Responses to GET requests are cached for 15 minutes (cache_page 60 * 15) using the "product_list"
+    key_prefix to reduce database load for frequently requested data.
+    Behavior and notes:
+    - Inherits ListAPIView, so standard DRF pagination, filtering and ordering settings apply unless
+        overridden at the view or project level.
+    - Cache key_prefix should be unique enough to avoid collisions with other cached endpoints.
+    - When featured status changes, ensure appropriate cache invalidation to keep results current.
+    Usage:
+    - Mount this view on a URL to expose a public endpoint that lists featured products via HTTP GET.
+    """
     queryset = Product.objects.filter(is_featured=True)
     serializer_class = ProductSerializer
     permission_classes = [permissions.AllowAny]
 
-    @method_decorator(cache_page(60 * 15, key_prefix="product_list"))
+    @method_decorator(cache_page(60 * 15, key_prefix="featured_product_list"))
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
 
 class ProductViewSet(ModelViewSet):
+    """
+    ProductViewSet is a ViewSet for managing Product objects.
+    Features:
+        - Provides CRUD operations for Product model.
+        - Supports searching products by 'name' and 'slug' fields.
+        - Caches the product list API response for 15 minutes using a key prefix 'product_list'.
+        - Allows unauthenticated access for GET requests; other methods require authentication and admin privileges.
+        - Supports filtering products by category via the 'category' query parameter (expects category slug).
+    Methods:
+        list(request, *args, **kwargs):
+            Returns a paginated list of products, with caching applied.
+        get_permissions():
+            Dynamically sets permissions based on request method:
+                - GET: Allows any user.
+                - Other methods: Requires authenticated admin user.
+        get_queryset():
+            Optionally filters products by category if 'category' query parameter is provided.
+    Attributes:
+        queryset: Queryset of all Product objects.
+        serializer_class: Serializer used for Product objects.
+        filter_backends: List of filter backends (supports search).
+        search_fields: Fields to search by ('name', 'slug').
+        permission_classes: Default permissions (authenticated admin users).
+    """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [SearchFilter]
@@ -84,6 +122,26 @@ class ProductViewSet(ModelViewSet):
 
 
 class CategoryViewSet(ModelViewSet):
+    """
+    CategoryViewSet handles CRUD operations for Category objects.
+    This viewset provides endpoints for listing, retrieving, creating, updating, and deleting categories.
+    It uses slug-based lookup for retrieving individual categories. The permissions are set such that
+    only authenticated admin users can perform write operations, while read operations (GET requests)
+    are open to any user.
+    Methods:
+        get_permissions(self):
+            Dynamically sets permissions based on the request method. Allows unrestricted access for GET requests,
+            while restricting other methods to authenticated admin users.
+        list(self, request, *args, **kwargs):
+            Returns a list of all categories using the default ModelViewSet behavior.
+        retrieve(self, request, slug=None):
+            Retrieves a category by its slug and returns a serialized list of products associated with that category.
+    Attributes:
+        queryset: Queryset of all Category objects.
+        serializer_class: Serializer used for Category objects.
+        lookup_url_kwarg: URL keyword argument used for slug-based lookup.
+        permission_classes: Default permission classes for the viewset.
+    """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_url_kwarg = "slug"
@@ -109,6 +167,38 @@ class CategoryViewSet(ModelViewSet):
 
 
 class OrderViewSet(ModelViewSet):
+    """
+    ViewSet for managing Order objects.
+    This viewset provides endpoints for authenticated users to create, retrieve, and list their orders.
+    It ensures that users can only access their own orders and handles order creation with associated products and shipping address.
+    Methods
+    -------
+    get_queryset():
+        Returns a queryset filtered to only include orders belonging to the authenticated user.
+    retrieve(request, *args, **kwargs):
+        Retrieves a specific order by its primary key, including the total price calculated from its order items.
+    create(request, *args, **kwargs):
+        Creates a new order for the authenticated user, including associated products and shipping address.
+        Validates the presence of required fields ('products' and 'shipping_address') in the request data.
+        Calculates the total price of the order based on the provided products and their quantities.
+    Attributes
+    ----------
+    queryset : QuerySet
+        The base queryset of all Order objects.
+    serializer_class : Serializer
+        The serializer class used for Order objects.
+    permission_classes : list
+        List of permission classes; only authenticated users can access these endpoints.
+    Permissions
+    -----------
+    - Only authenticated users can access the endpoints.
+    - Users can only view and create their own orders.
+    Responses
+    ---------
+    - On successful creation, returns order ID, success message, and total price.
+    - On retrieval, returns order details including total price.
+    - On bad request (missing required fields), returns HTTP 400 Bad Request.
+    """
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [
