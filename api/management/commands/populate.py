@@ -465,46 +465,46 @@ class Command(BaseCommand):
     featured_indices = random.sample(range(len(products)), 10)
 
     def handle(self, *args, **kwargs):
-        user = User.objects.create_superuser(
-            username="admin1", password="password", email="")
+        user = User.objects.create(
+            username="user", password="password", email="")
 
-        for cat in self.categories:
-            Category(
-                name=cat["name"],
-                slug=cat["slug"],
-                description=cat["description"]
-            ).save()
+        # for cat in self.categories:
+        #     Category(
+        #         name=cat["name"],
+        #         slug=cat["slug"],
+        #         description=cat["description"]
+        #     ).save()
 
-        for (idx, prod) in enumerate(self.products):
-            is_featured = False
+        # for (idx, prod) in enumerate(self.products):
+        #     is_featured = False
 
-            if idx in self.featured_indices:
-                is_featured = True
+        #     if idx in self.featured_indices:
+        #         is_featured = True
 
-            Product.objects.create(
-                name=prod['name'],
-                slug=prod['slug'],
-                description=prod['description'],
-                price=prod['price'],
-                stock=prod['stock'],
-                is_featured=is_featured,
-                category=Category.objects.get(pk=prod['category'])
-            )
+        #     Product.objects.create(
+        #         name=prod['name'],
+        #         slug=prod['slug'],
+        #         description=prod['description'],
+        #         price=prod['price'],
+        #         stock=prod['stock'],
+        #         is_featured=is_featured,
+        #         category=Category.objects.get(pk=prod['category'])
+        #     )
 
-        order = Order.objects.create(user=user)
+        # order = Order.objects.create(user=user)
 
-        products = [
-            'faf0b84a-964a-42b5-9b82-8eefd2b575e5',
-            'fa303229-4c09-4af3-8c07-38bccbcabe62',
-            'f45a7ac0-de55-405e-9f5c-15d524def88b',
-            'ebf0c1e9-b532-4c14-b33b-14543644adab'
-        ]
+        # products = [
+        #     'faf0b84a-964a-42b5-9b82-8eefd2b575e5',
+        #     'fa303229-4c09-4af3-8c07-38bccbcabe62',
+        #     'f45a7ac0-de55-405e-9f5c-15d524def88b',
+        #     'ebf0c1e9-b532-4c14-b33b-14543644adab'
+        # ]
 
-        for prod in products:
-            product = Product.objects.get(pk=prod)
-            order_item = OrderItem(
-                order=order, product=product, quantity=random.randint(1, 5)
-            ).save()
-            print(order_item)
+        # for prod in products:
+        #     product = Product.objects.get(pk=prod)
+        #     order_item = OrderItem(
+        #         order=order, product=product, quantity=random.randint(1, 5)
+        #     ).save()
+        #     print(order_item)
 
         self.stdout.write(self.style.SUCCESS("Database population complete."))

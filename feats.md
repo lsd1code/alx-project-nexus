@@ -30,17 +30,17 @@
     + ["accounts/profile/", "PUT", "Update user profile", "auth required"]
 
 - Product Catalogue 
-    + ["featured-products/", "GET", "Homepage with featured products", "No auth"]
-    + ["products/", "GET", "All products listing", "No auth"]
-    + ["products/{product_id}/", "GET", "Individual product details", "No auth"]
-    + ["products/?category={slug}/", "GET", "Products filtered by category", "No auth"]
-    + ["products/?search={value}/", "GET", "Products matching search query", "No auth"]
-    + ["categories/", "GET", "all categories listing", "No auth"]
-    + ["categories/{slug}/", "GET", "Products in a specific category", "No auth"]
+    + ["featured-products/", "GET", "Homepage with featured products", "No auth"] ✅
+    + ["products/", "GET", "All products listing", "No auth"] ✅
+    + ["products/{product_id}/", "GET", "Individual product details", "No auth"] ✅
+    + ["products/?category={slug}/", "GET", "Products filtered by category", "No auth"] ✅
+    + ["products/?search={value}/", "GET", "Products matching search query", "No auth"] ✅
+    + ["categories/", "GET", "all categories listing", "No auth"] ✅
+    + ["categories/{slug}/", "GET", "Products in a specific category", "No auth"] ✅
 
 - Orders
-    + ["orders/", "GET", "User's order history", "auth required"]
-    + ["orders/", "POST", "Create new user order", "auth required"]
+    + ["orders/", "GET", "User's order history", "auth required"] ✅
+    + ["orders/", "POST", "Create new user order", "auth required"] ✅
     + ["orders/{order_id}/", "GET", "Get specific order details", "auth required"]
     + ["orders/{order_id}/", "DELETE", "Delete specific order", "auth required"]
 

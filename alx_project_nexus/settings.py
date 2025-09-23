@@ -17,15 +17,15 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # DEBUG = False
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['*']
 
-SECURE_SSL_REDIRECT = True
+# SECURE_SSL_REDIRECT = True
 
-SESSION_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
 
-CSRF_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
 
-CSRF_TRUSTED_ORIGINS = ['https://']
+# CSRF_TRUSTED_ORIGINS = ['https://']
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -40,11 +40,17 @@ INSTALLED_APPS = [
     "cloudinary",
     "silk",
     "api",
+
+    # auth
+    'rest_framework.authtoken',
+    'corsheaders',
+    'djoser'
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -52,6 +58,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "silk.middleware.SilkyMiddleware",
 ]
+
+# CORS_ALLOWED_ORIGINS = ['http://', 'https://']
 
 ROOT_URLCONF = "alx_project_nexus.urls"
 
@@ -133,6 +141,7 @@ AUTH_USER_MODEL = "api.User"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
@@ -171,6 +180,7 @@ CACHES = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
+    "AUTH_HEADER_TYPES": ('JWT',)
 }
 
 # Documentation
