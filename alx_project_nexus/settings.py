@@ -11,10 +11,9 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = False
 DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
@@ -40,8 +39,6 @@ INSTALLED_APPS = [
     "cloudinary",
     "silk",
     "api",
-
-    # auth
     'rest_framework.authtoken',
     'corsheaders',
     'djoser'
@@ -125,7 +122,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
@@ -175,12 +171,11 @@ CACHES = {
     }
 }
 
-
 # JWT Settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
-    "AUTH_HEADER_TYPES": ('JWT',)
+    "AUTH_HEADER_TYPES": ('JWT', 'Bearer')
 }
 
 # Documentation

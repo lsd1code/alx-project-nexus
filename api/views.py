@@ -229,15 +229,20 @@ class OrderViewSet(ModelViewSet):
             return Response("Bad Request", status.HTTP_400_BAD_REQUEST)
 
         user = request.user
-        user_products = data['products']
-        user_shipping_address = data['shipping_address']
 
-        shipping_address = ShippingAddress.objects.create(
-            address=user_shipping_address['address'],
-            city=user_shipping_address['city'],
-            state=user_shipping_address['state'],
-            zip_code=user_shipping_address['zip_code'],
-        )
+        try:
+            user_products = data['products']
+            user_shipping_address = data['shipping_address']
+
+            shipping_address = ShippingAddress.objects.create(
+                address=user_shipping_address['address'],
+                city=user_shipping_address['city'],
+                state=user_shipping_address['state'],
+                zip_code=user_shipping_address['zip_code'],
+            )
+        except Exception:
+            return Response({"message": "Bad Request"}, status=status.HTTP_400_BAD_REQUEST)
+
         order = Order(
             user=user, shipping_address=shipping_address
         )

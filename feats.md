@@ -41,8 +41,8 @@
 - Orders
     + ["orders/", "GET", "User's order history", "auth required"] ✅
     + ["orders/", "POST", "Create new user order", "auth required"] ✅
-    + ["orders/{order_id}/", "GET", "Get specific order details", "auth required"]
-    + ["orders/{order_id}/", "DELETE", "Delete specific order", "auth required"]
+    + ["orders/{order_id}/", "GET", "Get specific order details", "auth required"] ✅
+    + ["orders/{order_id}/", "DELETE", "Delete specific order", "auth required"] ✅
 
 - Shopping Cart (Frontend)
     + ["cart/", "GET", "View cart contents", "no auth(session managed)"]
