@@ -1,6 +1,7 @@
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, BooleanField
 
-from api.models import Category, Order, OrderItem, Product, ShippingAddress
+from api.models import Category, Order, OrderItem, Product, ShippingAddress, User
 
 
 class ShippingAddressSerializer(ModelSerializer):
@@ -31,6 +32,7 @@ class ProductSerializer(ModelSerializer):
             "is_featured",
             "category",
             "is_available",
+            "image",
         ]
 
 
@@ -54,3 +56,29 @@ class OrderItemSerializer(ModelSerializer):
     class Meta:
         model = OrderItem
         fields = '__all__'
+
+
+class UserSerializer(ModelSerializer):
+    password = serializers.CharField(
+        max_length=100, min_length=6, write_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'email',
+            'first_name',
+            'last_name',
+            'password'
+        ]
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        user = User.objects.create_user(  # type:ignore
+            email=validated_data.get('email'),
+            first_name=validated_data.get('first_name'),
+            last_name=validated_data.get('last_name'),
+            password=validated_data.get('password'),
+        )
+        return user

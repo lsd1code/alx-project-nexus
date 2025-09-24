@@ -12,7 +12,9 @@ from api.views import (
     CategoryViewSet,
     ProductViewSet,
     FeaturedProducts,
-    OrderViewSet
+    OrderViewSet,
+    register,
+    login
 )
 
 
@@ -23,6 +25,9 @@ router.register(r"orders", OrderViewSet, basename="orders")
 
 
 urlpatterns = [
+    path("auth/register/", register, name="register"),
+    
+    
     path(
         "featured-products/", FeaturedProducts.as_view(), name="featured_products"
     ),

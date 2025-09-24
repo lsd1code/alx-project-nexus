@@ -15,13 +15,26 @@ from rest_framework import generics
 from rest_framework.reverse import reverse
 from rest_framework import status
 
-from api.models import Category, Product, Order, OrderItem, ShippingAddress
-from api.serializers import CategorySerializer, ProductSerializer, OrderSerializer
+from api.models import Category, Product, Order, OrderItem, ShippingAddress, User
+from api.serializers import CategorySerializer, ProductSerializer, OrderSerializer, UserSerializer
 
 
 @api_view(['POST'])
 def register(req: Request):
-    return Response("user registration")
+    data = req.data
+
+    if not data:
+        return Response("Bad Request", status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = UserSerializer(data=data)
+
+    if serializer.is_valid(raise_exception=True):
+        serializer.save()
+
+    return Response({
+        "data": serializer.data,
+        "message": f"Hi {data['first_name']} thanks for signing up!" #type: ignore
+    })
 
 
 @api_view(['POST'])

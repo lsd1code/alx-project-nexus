@@ -1,10 +1,29 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils.translation import gettext_lazy as _
 from cloudinary.models import CloudinaryField
 
+from api.managers import UserManager
 
-class User(AbstractUser):
+
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True, max_length=255)
+    first_name = models.CharField(max_length=255, verbose_name=_("First Name"))
+    last_name = models.CharField(max_length=255, verbose_name=_("Last Name"))
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    last_login = models.DateTimeField(auto_now=True)
+
+    USERNAME_FIELD = "email"
+
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
+
     groups = models.ManyToManyField(
         'auth.Group',
         verbose_name='groups',

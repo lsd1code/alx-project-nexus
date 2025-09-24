@@ -33,12 +33,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "api",
+    "users",
     "rest_framework",
     "drf_spectacular",
     "django_filters",
     "cloudinary",
     "silk",
-    "api",
     'rest_framework.authtoken',
     'corsheaders',
     'djoser'
@@ -133,6 +134,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "api.User"
+# AUTH_USER_MODEL = "users.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
