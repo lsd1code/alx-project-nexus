@@ -465,15 +465,12 @@ class Command(BaseCommand):
     featured_indices = random.sample(range(len(products)), 10)
 
     def handle(self, *args, **kwargs):
-        user = User.objects.create(
-            username="user", password="password", email="")
-
-        # for cat in self.categories:
-        #     Category(
-        #         name=cat["name"],
-        #         slug=cat["slug"],
-        #         description=cat["description"]
-        #     ).save()
+        for cat in self.categories:
+            Category(
+                name=cat["name"],
+                slug=cat["slug"],
+                description=cat["description"]
+            ).save()
 
         # for (idx, prod) in enumerate(self.products):
         #     is_featured = False
@@ -491,13 +488,15 @@ class Command(BaseCommand):
         #         category=Category.objects.get(pk=prod['category'])
         #     )
 
+        # user = User.objects.first()
+
         # order = Order.objects.create(user=user)
 
         # products = [
-        #     'faf0b84a-964a-42b5-9b82-8eefd2b575e5',
-        #     'fa303229-4c09-4af3-8c07-38bccbcabe62',
-        #     'f45a7ac0-de55-405e-9f5c-15d524def88b',
-        #     'ebf0c1e9-b532-4c14-b33b-14543644adab'
+        #     'fd749e34-f9b2-4ee0-919f-dac4e22f8844',
+        #     'fb77011d-52fc-46e0-9dc8-e52c9cf132fd',
+        #     'f9bd3d07-3744-4f19-bc47-92bdade913be',
+        #     'f6029e9b-0762-41a8-bd4d-eee812a5715d'
         # ]
 
         # for prod in products:

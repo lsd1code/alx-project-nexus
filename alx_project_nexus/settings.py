@@ -11,7 +11,7 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = False
@@ -19,14 +19,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['*']
-
-SECURE_SSL_REDIRECT = True
-
-SESSION_COOKIE_SECURE = True
-
-CSRF_COOKIE_SECURE = True
-
 # SECURE_SSL_REDIRECT = True
 
 # SESSION_COOKIE_SECURE = True
@@ -42,14 +34,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "api",
+    "users",
     "rest_framework",
     "drf_spectacular",
     "django_filters",
     "cloudinary",
     "silk",
-    "api",
-
-    # auth
     'rest_framework.authtoken',
     'corsheaders',
     'djoser'
@@ -133,7 +124,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_URL = "static/"
@@ -144,6 +134,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "api.User"
+# AUTH_USER_MODEL = "users.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -175,23 +166,22 @@ REST_FRAMEWORK = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/2",
+        # "LOCATION": "redis://127.0.0.1:6379/2",
+        "LOCATION": os.getenv("REDIS_EXTERNAL_URL"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
 
-
+# JWT Settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
-    "AUTH_HEADER_TYPES": ('JWT',)
+    "AUTH_HEADER_TYPES": ('JWT', 'Bearer')
 }
 
 # Documentation
-# Documentation
-# API Documentation
 SPECTACULAR_SETTINGS = {
     "TITLE": "ALX Project Nexus: E-Commerce API",
     "DESCRIPTION": "The e-commerce backend simulates a real-world development environment, emphasizing scalability, security, and performance. Participants will: - Design and optimize relational database schemas.",

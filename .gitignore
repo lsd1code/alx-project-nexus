@@ -1,5 +1,4 @@
 .env
-Dockerfile
-docker-compose.yml
-.dockerignore
-./feats.md
+./Dockerfile
+./docker-compose.yml
+feats.md
