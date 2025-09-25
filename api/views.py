@@ -18,29 +18,8 @@ from rest_framework import status
 
 from api.models import Category, Product, Order, OrderItem, ShippingAddress, User
 from api.serializers import CategorySerializer, ProductSerializer, OrderSerializer, UserSerializer
-
-
-@api_view(['POST'])
-def register(req: Request):
-    data = req.data
-
-    if not data:
-        return Response("Bad Request", status=status.HTTP_400_BAD_REQUEST)
-
-    serializer = UserSerializer(data=data)
-
-    if serializer.is_valid(raise_exception=True):
-        serializer.save()
-
-    return Response({
-        "data": serializer.data,
-        "message": f"Hi {data['first_name']} thanks for signing up!" #type: ignore
-    })
-
-
-@api_view(['POST'])
-def login(req: Request):
-    return Response("user registration")
+from api.auth import get_tokens_for_user
+from api.permissions import CustomerProfileAccessPermission
 
 
 @api_view(["GET"])
@@ -55,6 +34,88 @@ def index(req: Request):
         Response: An HTTP response that redirects the user to the Swagger API docs.
     """
     return Response(reverse("swagger-ui"))
+
+
+class UserProfileAPIView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    UserProfileAPIView is a Django REST Framework view that provides 
+    retrieve, update, and destroy operations for user profile instances.
+
+    This view is based on the RetrieveUpdateDestroyAPIView class, which 
+    allows for the following HTTP methods:
+    - GET: Retrieve a user profile by its ID.
+    - PUT: Update an existing user profile.
+    - PATCH: Partially update an existing user profile.
+    - DELETE: Remove a user profile from the database.
+
+    Attributes:
+        queryset (QuerySet): A QuerySet containing all User objects.
+        serializer_class (Serializer): The serializer class used to 
+        validate and serialize the user profile data.
+        permission_classes (list): A list of permission classes that 
+        determine access to this view. In this case, it requires the 
+        user to be authenticated and checks for custom permissions 
+        defined in CustomerProfileAccessPermission.
+
+    Usage:
+        This view can be used in conjunction with a URL routing 
+        configuration to allow clients to interact with user profiles 
+        via a RESTful API.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [
+        permissions.IsAuthenticated,
+        CustomerProfileAccessPermission
+    ]
+
+
+class UserRegistration(generics.CreateAPIView):
+    """
+    API view for user registration.
+    This view handles the creation of new user accounts via POST requests.
+    It uses the `UserSerializer` to validate and save user data. Upon successful
+    registration, it generates JWT tokens for the newly created user and returns
+    a response containing a welcome message, the tokens, and the serialized user data.
+    Methods:
+        create(request, *args, **kwargs):
+            Handles POST requests for user registration.
+            - Validates incoming data.
+            - Saves the new user if data is valid.
+            - Generates JWT tokens for the user.
+            - Returns a response with a welcome message, tokens, and user data.
+    Returns:
+        Response: 
+            - 201 Created with user data and tokens on success.
+            - 400 Bad Request if the input data is missing or invalid.
+    Raises:
+        ValidationError: If the provided data fails serializer validation.
+    Attributes:
+        serializer_class (UserSerializer): The serializer class used for validating and saving user data.
+    """
+    serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+
+        if not data:
+            return Response("Bad Request", status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data=data)
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+
+        tokens = get_tokens_for_user(
+            user=User.objects.get(pk=serializer.data['id'])
+        )
+
+        return Response({
+            "message": f"Hi {data['first_name']}, thanks for signing up!",
+            "jwt_tokens": tokens,
+            "data": serializer.data,
+        })
 
 
 class FeaturedProducts(generics.ListAPIView):
@@ -276,7 +337,7 @@ class OrderViewSet(ModelViewSet):
             order_item = OrderItem.objects.create(
                 product=product, order=order, quantity=quantity
             )
-            
+
             total_price += order_item.subtotal
         return Response(
             {

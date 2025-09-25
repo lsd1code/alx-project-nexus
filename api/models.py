@@ -8,9 +8,16 @@ from api.managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    id = models.UUIDField(
+        primary_key=True, editable=False, default=uuid.uuid4
+    )
     email = models.EmailField(unique=True, max_length=255)
     first_name = models.CharField(max_length=255, verbose_name=_("First Name"))
     last_name = models.CharField(max_length=255, verbose_name=_("Last Name"))
+    phone_number = models.CharField(
+        max_length=15, verbose_name=_("Phone Number"), blank=True, null=True
+    )
+
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)

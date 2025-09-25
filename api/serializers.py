@@ -60,14 +60,17 @@ class OrderItemSerializer(ModelSerializer):
 
 class UserSerializer(ModelSerializer):
     password = serializers.CharField(
-        max_length=100, min_length=6, write_only=True)
+        max_length=100, min_length=6, write_only=True
+    )
 
     class Meta:
         model = User
         fields = [
+            'id',
             'email',
             'first_name',
             'last_name',
+            'phone_number',
             'password'
         ]
 

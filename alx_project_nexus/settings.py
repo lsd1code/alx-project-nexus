@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "api",
-    "users",
     "rest_framework",
     "drf_spectacular",
     "django_filters",
@@ -166,7 +165,6 @@ REST_FRAMEWORK = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        # "LOCATION": "redis://127.0.0.1:6379/2",
         "LOCATION": os.getenv("REDIS_EXTERNAL_URL"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -176,8 +174,8 @@ CACHES = {
 
 # JWT Settings
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ('JWT', 'Bearer')
 }
 
