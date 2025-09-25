@@ -250,36 +250,25 @@ class CategoryViewSet(ModelViewSet):
 
 class OrderViewSet(ModelViewSet):
     """
-    ViewSet for managing Order objects.
-    This viewset provides endpoints for authenticated users to create, retrieve, and list their orders.
-    It ensures that users can only access their own orders and handles order creation with associated products and shipping address.
-    Methods
-    -------
-    get_queryset():
-        Returns a queryset filtered to only include orders belonging to the authenticated user.
-    retrieve(request, *args, **kwargs):
-        Retrieves a specific order by its primary key, including the total price calculated from its order items.
-    create(request, *args, **kwargs):
-        Creates a new order for the authenticated user, including associated products and shipping address.
-        Validates the presence of required fields ('products' and 'shipping_address') in the request data.
-        Calculates the total price of the order based on the provided products and their quantities.
-    Attributes
-    ----------
-    queryset : QuerySet
-        The base queryset of all Order objects.
-    serializer_class : Serializer
-        The serializer class used for Order objects.
-    permission_classes : list
-        List of permission classes; only authenticated users can access these endpoints.
-    Permissions
-    -----------
-    - Only authenticated users can access the endpoints.
-    - Users can only view and create their own orders.
-    Responses
-    ---------
-    - On successful creation, returns order ID, success message, and total price.
-    - On retrieval, returns order details including total price.
-    - On bad request (missing required fields), returns HTTP 400 Bad Request.
+    OrderViewSet is a Django REST Framework viewset that provides CRUD operations for managing orders.
+    Attributes:
+        queryset (QuerySet): A QuerySet containing all Order objects.
+        serializer_class (Serializer): The serializer class used for serializing and deserializing Order objects.
+        permission_classes (list): A list of permission classes that determine access to the viewset.
+    Methods:
+        get_queryset():
+            Returns a filtered queryset of orders belonging to the authenticated user.
+        list(request, *args, **kwargs):
+            Retrieves a list of orders for the authenticated user, with caching applied for performance.
+        retrieve(request, *args, **kwargs):
+            Retrieves a specific order by its primary key (pk) and includes the total price of the order items.
+        create(request, *args, **kwargs):
+            Creates a new order based on the provided request data, including products and shipping address.
+            Handles payment processing using Stripe and saves the transaction details.
+        Raises:
+            Http404: If the order with the specified primary key does not exist.
+            ValidationError: If the provided data is invalid or missing required fields.
+            StripeError: If there is an error during payment processing with Stripe.
     """
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
