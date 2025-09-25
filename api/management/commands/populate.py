@@ -463,6 +463,7 @@ class Command(BaseCommand):
     ]
 
     featured_indices = random.sample(range(len(products)), 10)
+    is_hot_indices = random.sample(range(len(products)), 10)
 
     def handle(self, *args, **kwargs):
         for cat in self.categories:
@@ -472,38 +473,25 @@ class Command(BaseCommand):
                 description=cat["description"]
             ).save()
 
-        # for (idx, prod) in enumerate(self.products):
-        #     is_featured = False
+        for (idx, prod) in enumerate(self.products):
+            is_featured = False
+            is_hot = False
+            
+            if idx in self.featured_indices:
+                is_featured = True
 
-        #     if idx in self.featured_indices:
-        #         is_featured = True
+            if idx in self.is_hot_indices:
+                is_hot = True
 
-        #     Product.objects.create(
-        #         name=prod['name'],
-        #         slug=prod['slug'],
-        #         description=prod['description'],
-        #         price=prod['price'],
-        #         stock=prod['stock'],
-        #         is_featured=is_featured,
-        #         category=Category.objects.get(pk=prod['category'])
-        #     )
-
-        # user = User.objects.first()
-
-        # order = Order.objects.create(user=user)
-
-        # products = [
-        #     'fd749e34-f9b2-4ee0-919f-dac4e22f8844',
-        #     'fb77011d-52fc-46e0-9dc8-e52c9cf132fd',
-        #     'f9bd3d07-3744-4f19-bc47-92bdade913be',
-        #     'f6029e9b-0762-41a8-bd4d-eee812a5715d'
-        # ]
-
-        # for prod in products:
-        #     product = Product.objects.get(pk=prod)
-        #     order_item = OrderItem(
-        #         order=order, product=product, quantity=random.randint(1, 5)
-        #     ).save()
-        #     print(order_item)
+            Product.objects.create(
+                name=prod['name'],
+                slug=prod['slug'],
+                description=prod['description'],
+                price=prod['price'],
+                stock=prod['stock'],
+                is_featured=is_featured,
+                is_hot=is_hot,
+                category=Category.objects.get(pk=prod['category'])
+            )
 
         self.stdout.write(self.style.SUCCESS("Database population complete."))

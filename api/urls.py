@@ -25,25 +25,28 @@ router.register(r"orders", OrderViewSet, basename="orders")
 
 
 urlpatterns = [
-    path("accounts/profile/<str:pk>/",
-         UserProfileAPIView.as_view(), name="featured_products"),
-    path("featured-products/", FeaturedProducts.as_view(),
-         name="featured_products"),
-
-    path("accounts/auth/register/",
-        UserRegistration.as_view(), name="register-user"),
-    path("auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-
-    path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
-        "schema/swagger-ui/",
-        SpectacularSwaggerView.as_view(url_name="schema"),
-        name="swagger-ui",
+        "featured-products/", FeaturedProducts.as_view(), name="featured_products"
+    ),
+
+    #! Authentication
+    path(
+        "accounts/profile/<str:pk>/", UserProfileAPIView.as_view(), name="featured_products"
     ),
     path(
-        "schema/redoc/",
-        SpectacularRedocView.as_view(url_name="schema"),
-        name="redoc",
+        "accounts/auth/register/", UserRegistration.as_view(), name="register-user"
+    ),
+    path(
+        "accounts/auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"
+    ),
+    path("auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+
+    #! Documentation
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui",
+    ),
+    path(
+        "schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc",
     ),
 ] + router.urls
