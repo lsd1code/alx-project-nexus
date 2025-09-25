@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, BooleanField
 
-from api.models import Category, Order, OrderItem, Product, ShippingAddress, User
+from api.models import Category, Order, OrderItem, Product, ShippingAddress, User, Transaction
 
 
 class ShippingAddressSerializer(ModelSerializer):
@@ -30,6 +30,8 @@ class ProductSerializer(ModelSerializer):
             "price",
             "stock",
             "is_featured",
+            "is_hot",
+            "sale_percentage",
             "category",
             "is_available",
             "image",
@@ -85,3 +87,15 @@ class UserSerializer(ModelSerializer):
             password=validated_data.get('password'),
         )
         return user
+
+
+class TransactionSerializer(ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = [
+            'transaction_id',
+            'currency',
+            'stripe_payment_id',
+            'created_at',
+            'user_email',
+        ]

@@ -94,12 +94,26 @@ class ShippingAddress(models.Model):
         return f"{self.address} - {self.city}"
 
 
-class Order(models.Model):
-    class OrderStatusChoices(models.TextChoices):
-        PENDING = "PENDING"
-        CONFIRMED = "CONFIRMED"
-        CANCELLED = "CANCELLED"
+class Transaction(models.Model):
+    transaction_id = models.UUIDField(
+        primary_key=True, editable=False, default=uuid.uuid4
+    )
+    currency = models.CharField(max_length=10, default='zar')
+    stripe_payment_id = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user_email = models.EmailField()
 
+    def __str__(self) -> str:
+        return f'Transaction: {self.transaction_id} - {self.user_email}'
+
+
+class OrderStatusChoices(models.TextChoices):
+    PENDING = "PENDING"
+    CONFIRMED = "CONFIRMED"
+    CANCELLED = "CANCELLED"
+
+
+class Order(models.Model):
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
@@ -116,7 +130,9 @@ class Order(models.Model):
         ShippingAddress, on_delete=models.DO_NOTHING, related_name="shipping_address", null=True, blank=True
     )
     order_date = models.DateTimeField(auto_now=True)
-    transaction_id = models.CharField(max_length=100)
+    transaction_id = models.ForeignKey(
+        Transaction, on_delete=models.DO_NOTHING, related_name="transaction_ids", null=True, blank=True
+    )
 
     def __str__(self):
         return f"{self.id} - {self.status}"

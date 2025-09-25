@@ -1,5 +1,6 @@
 from decimal import Decimal
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -16,10 +17,14 @@ from rest_framework import generics
 from rest_framework.reverse import reverse
 from rest_framework import status
 
-from api.models import Category, Product, Order, OrderItem, ShippingAddress, User
-from api.serializers import CategorySerializer, ProductSerializer, OrderSerializer, UserSerializer
+from api.models import Category, Product, Order, OrderItem, ShippingAddress, User, OrderStatusChoices
+from api.serializers import CategorySerializer, ProductSerializer, OrderSerializer, UserSerializer, TransactionSerializer
 from api.auth import get_tokens_for_user
 from api.permissions import CustomerProfileAccessPermission
+
+import stripe
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 @api_view(["GET"])
@@ -172,8 +177,7 @@ class ProductViewSet(ModelViewSet):
     filter_backends = [SearchFilter]
     search_fields = ['name', 'slug']
     permission_classes = [
-        permissions.IsAuthenticated,
-        permissions.IsAdminUser
+        permissions.AllowAny
     ]
 
     # key-prefix: used as the key prefix for the cached api responses
@@ -182,8 +186,11 @@ class ProductViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
     def get_permissions(self):
-        if self.request.method == 'GET':
-            self.permission_classes = [permissions.AllowAny]
+        if self.request.method != 'GET':
+            self.permission_classes = [
+                permissions.IsAdminUser,
+                permissions.IsAuthenticated
+            ]
         return super().get_permissions()
 
     def get_queryset(self):
@@ -308,6 +315,9 @@ class OrderViewSet(ModelViewSet):
         if not "products" in data or not "shipping_address" in data:
             return Response("Bad Request", status.HTTP_400_BAD_REQUEST)
 
+        if len(data['products']) < 1:
+            return Response("Bad Request", status.HTTP_400_BAD_REQUEST)
+
         user = request.user
 
         try:
@@ -323,27 +333,56 @@ class OrderViewSet(ModelViewSet):
         except Exception:
             return Response({"message": "Bad Request"}, status=status.HTTP_400_BAD_REQUEST)
 
-        order = Order(
-            user=user, shipping_address=shipping_address
-        )
+        order = Order(user=user, shipping_address=shipping_address)
         order.save()
 
-        total_price = 0
+        total_amount = 0
 
         for prod in user_products:
             product = Product.objects.get(pk=prod['product_id'])
             quantity = prod['quantity']
 
             order_item = OrderItem.objects.create(
-                product=product, order=order, quantity=quantity
+                product=product, order=order, quantity=quantity)
+
+            total_amount += order_item.subtotal
+
+        try:
+            currency = 'usd'
+
+            intent = stripe.PaymentIntent.create(
+                amount=int(total_amount),
+                currency=currency
             )
 
-            total_price += order_item.subtotal
-        return Response(
-            {
-                "order_id": order.id,
-                "message": "Order Created Successfully",
-                "total_price": total_price
-            },
-            status=status.HTTP_201_CREATED
-        )
+            transaction_data = {
+                'amount': total_amount,
+                'currency': currency,
+                'stripe_payment_id': intent['client_secret'],
+                'user_email': user.email
+            }
+
+            serializer = TransactionSerializer(data=transaction_data)
+
+            if serializer.is_valid():
+                model_instance = serializer.save()
+
+                order.transaction_id = model_instance  # type:ignore
+                order.status = OrderStatusChoices.CONFIRMED
+                order.save()
+
+                return Response({
+                    "order_id": order.id,
+                    "message": "Order Created Successfully",
+                    "total_amount": total_amount,
+                    'client_secret': intent['client_secret'],
+                    'transaction': serializer.data
+                }, status=status.HTTP_201_CREATED)
+
+        except stripe.error.StripeError as e:  # type:ignore
+            order.status = OrderStatusChoices.CANCELLED
+
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )

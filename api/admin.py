@@ -1,10 +1,11 @@
 from django.contrib import admin
 
-from api.models import Category, Order, OrderItem, Product, User, ShippingAddress
+from api.models import Category, Order, OrderItem, Product, User, ShippingAddress, Transaction
 
 
 
 admin.site.register(User)
+admin.site.register(Transaction)
 admin.site.register(Product)
 admin.site.register(Category)
 admin.site.register(Order)

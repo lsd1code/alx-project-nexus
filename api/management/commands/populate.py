@@ -463,6 +463,7 @@ class Command(BaseCommand):
     ]
 
     featured_indices = random.sample(range(len(products)), 10)
+    
     is_hot_indices = random.sample(range(len(products)), 10)
 
     def handle(self, *args, **kwargs):
