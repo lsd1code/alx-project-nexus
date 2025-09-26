@@ -67,7 +67,7 @@ class Product(models.Model):
         max_digits=10, decimal_places=2, blank=True, null=True)
     stock = models.PositiveIntegerField()
     category = models.ForeignKey(
-        Category, on_delete=models.DO_NOTHING, related_name="products"
+        Category, on_delete=models.DO_NOTHING, related_name="products", null=True, blank=True
     )
     image = CloudinaryField('image', null=True, blank=True)
     is_featured = models.BooleanField(default=False)

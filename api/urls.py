@@ -14,7 +14,8 @@ from api.views import (
     FeaturedProducts,
     OrderViewSet,
     UserRegistration,
-    UserProfileAPIView
+    UserProfileAPIView,
+    index
 )
 
 
@@ -26,15 +27,18 @@ router.register(r"orders", OrderViewSet, basename="orders")
 
 urlpatterns = [
     path(
+        "", index, name="index"
+    ),
+    path(
         "featured-products/", FeaturedProducts.as_view(), name="featured_products"
     ),
 
     #! Authentication
     path(
-        "accounts/profile/<str:pk>/", UserProfileAPIView.as_view(), name="featured_products"
+        "accounts/profile/<str:pk>/", UserProfileAPIView.as_view(), name="user_profile"
     ),
     path(
-        "accounts/auth/register/", UserRegistration.as_view(), name="register-user"
+        "accounts/auth/register/", UserRegistration.as_view(), name="register_user"
     ),
     path(
         "accounts/auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"
