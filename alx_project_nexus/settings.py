@@ -19,6 +19,8 @@ ALLOWED_HOSTS = ['*']  # Set to True because it has to be reviewed
 
 SESSION_COOKIE_SECURE = True
 
+CSRF_TRUSTED_ORIGINS = ['https://', 'http://']
+
 CSRF_COOKIE_SECURE = True
 
 INSTALLED_APPS = [
