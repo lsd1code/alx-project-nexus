@@ -331,6 +331,21 @@ class OrderViewSet(ModelViewSet):
             product = Product.objects.get(pk=prod['product_id'])
             quantity = prod['quantity']
 
+            if not product.is_available:
+                return Response(
+                    {'message': f'Product {prod['product_id']} is out of stock'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if (product.stock - quantity) < 0:  # type:ignore
+                return Response(
+                    {'message': f'You cannot get that amount of the particular product {prod['product_id']}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            product.stock = product.stock - quantity
+            product.save()
+
             order_item = OrderItem.objects.create(
                 product=product, order=order, quantity=quantity)
 
