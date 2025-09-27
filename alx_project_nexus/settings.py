@@ -14,6 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "SECRET_KEY")
 
 DEBUG = False
+# DEBUG = True
 
 ALLOWED_HOSTS = ['*']  # Set to True because it has to be reviewed
 
@@ -86,7 +87,7 @@ DATABASES = {
         "NAME": os.getenv("POSTGRES_DB_NAME"),
         "PASSWORD": os.getenv("POSTGRES_DB_PASSWORD"),
         "HOST": os.getenv("POSTGRES_DB_HOST"),
-        "PORT": os.getenv("POSTGRES_DB_PORT"),
+        "PORT": os.getenv("POSTGRES_DB_PORT", "5432"),
     }
 }
 
@@ -162,7 +163,7 @@ REST_FRAMEWORK = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.getenv("REDIS_URL"),
+        "LOCATION": os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1"),
         # "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -187,11 +188,11 @@ SPECTACULAR_SETTINGS = {
 
 # Cloudinary - Django integration (Images upload/retrieval)
 cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET")
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME", ""),
+    api_key=os.getenv("CLOUDINARY_API_KEY", ""),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET", "")
 )
 
 # Stripe keys
-STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
